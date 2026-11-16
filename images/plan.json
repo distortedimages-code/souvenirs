@@ -40,6 +40,18 @@
       "magenta": true
     },
     {
+      "image": "s01/porteuse",
+      "prompt": "prompts/s01/porteuse.txt",
+      "references": [
+        "s01/fragment",
+        "s01/garcons"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
+    },
+    {
       "image": "s01/avion_profil",
       "prompt": "prompts/s01/avion_profil.txt",
       "references": [
