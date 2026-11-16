@@ -2,7 +2,7 @@
 """Transforme les images générées en calques de décor prêts pour le jeu.
 
 - le fond magenta des calques avant est retiré (transparence nette, sans liseré rose) ;
-- chaque calque est ramené sur une vraie grille de pixels (1536 × 1024 → 384 × 256 par défaut) ;
+- chaque calque est ramené sur une vraie grille de pixels (1536 × 1024 → 192 × 128 avec « pixel » = 8) ;
 - tous les calques d'un souvenir partagent la palette du fond, pour s'accorder entre eux et avec les personnages.
 
   python outils/preparer_decor.py s01            # lit images/generees/s01, écrit jeu/assets/s01
@@ -14,8 +14,8 @@ import numpy as np
 from PIL import Image
 
 RACINE = Path(__file__).resolve().parent.parent
-FACTEUR = 4          # 1 pixel du jeu = 4 × 4 pixels de l'image générée
-COULEURS = 64        # taille de la palette commune d'un souvenir
+FACTEUR = 8          # par défaut ; plan.json peut le fixer (« pixel »)
+COULEURS = 16        # par défaut ; plan.json peut la fixer (« couleurs »)
 
 
 def masque_magenta(rgb):
@@ -48,6 +48,8 @@ def main():
     dst.mkdir(parents=True, exist_ok=True)
     plan = json.loads((RACINE / 'images' / 'plan.json').read_text(encoding='utf-8'))
     calques = [e for e in plan['images'] if e['image'].startswith(souvenir + '/')]
+    global FACTEUR, COULEURS
+    FACTEUR = int(plan.get('pixel', FACTEUR)); COULEURS = int(plan.get('couleurs', COULEURS))
 
     # 1) tous les calques réduits sur la grille ; 2) une palette commune apprise sur tous leurs pixels visibles
     reduits = []
