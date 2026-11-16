@@ -1,5 +1,5 @@
 {
-  "total": 0.8563,
+  "total": 0.9245,
   "images": {
     "s01/fond": {
       "empreinte": "b7a2522538ac32e5",
@@ -78,6 +78,12 @@
       "cout": 0.0552,
       "recue": "1536x1024",
       "date": "2026-11-16 18:25 UTC"
+    },
+    "s01/porteuse": {
+      "empreinte": "cf86b9c981e6761b",
+      "cout": 0.0682,
+      "recue": "1536x1024",
+      "date": "2026-11-16 19:07 UTC"
     }
   }
 }
