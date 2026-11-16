@@ -1,23 +1,23 @@
 {
-  "total": 0.2078,
+  "total": 0.3604,
   "images": {
     "s01/fond": {
-      "empreinte": "8000b6a9f435c9be",
+      "empreinte": "b7a2522538ac32e5",
       "cout": 0.0425,
       "recue": "1536x1024",
-      "date": "2026-11-16 16:22 UTC"
+      "date": "2026-11-16 16:39 UTC"
     },
     "s01/plan_moyen": {
-      "empreinte": "ecbbcf544f6f7e29",
+      "empreinte": "22d0a10877a8b1f9",
       "cout": 0.055,
       "recue": "1536x1024",
-      "date": "2026-11-16 16:23 UTC"
+      "date": "2026-11-16 16:39 UTC"
     },
     "s01/premier_plan": {
-      "empreinte": "f2fa0df854e169e9",
-      "cout": 0.0549,
+      "empreinte": "3a4de34b54e25f12",
+      "cout": 0.0551,
       "recue": "1536x1024",
-      "date": "2026-11-16 16:23 UTC"
+      "date": "2026-11-16 16:40 UTC"
     },
     "s01/porteur_enfant": {
       "empreinte": "82c46c3a4c3af11f",
