@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<title>Souvenirs — n°1 · Le petit avion</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500&family=Pixelify+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;overscroll-behavior:none}
+body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;font-family:'Pixelify Sans',system-ui,sans-serif;color:#fbefe2}
+#stage{position:fixed;inset:0;overflow:hidden;background:#000}
+#scene{position:absolute;inset:0;transition:filter 1.6s ease}
+#scene.doux{filter:saturate(.55) brightness(.8)}
+#scene canvas{position:absolute;left:0;top:0;will-change:filter}
+#vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 80% 75% at 50% 48%,rgba(0,0,0,0) 48%,rgba(0,0,0,.7) 100%);transition:opacity 2s}
+#grain{position:absolute;inset:-2px;pointer-events:none;opacity:.09;mix-blend-mode:overlay;background-size:160px 160px}
+#ui{position:absolute;inset:0;pointer-events:none}
+
+#voix{position:absolute;left:7%;right:7%;bottom:calc(9% + env(safe-area-inset-bottom));text-align:center;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(21px,2.2vw + 12px,38px);line-height:1.3;color:#fff4e6;text-shadow:0 0 24px rgba(255,170,90,.4),0 2px 3px rgba(0,0,0,.85);opacity:0;filter:blur(6px);transition:opacity 1.2s ease,filter 1.2s ease}
+#voix.show{opacity:1;filter:blur(0)}
+
+#jouet{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;opacity:0;pointer-events:none;transition:opacity 1.4s;background:radial-gradient(ellipse at 50% 46%,#4a2a14 0%,#2a160b 45%,#0c0603 100%)}
+#jouet.show{opacity:1;pointer-events:auto}
+#jcadre{position:relative;display:flex;align-items:center;gap:18px}
+#jcv{display:block;transition:transform .35s cubic-bezier(.3,1.4,.5,1);filter:drop-shadow(0 18px 30px rgba(0,0,0,.55))}
+.fleche{font-size:34px;color:rgba(255,230,190,.55);padding:14px;cursor:pointer;pointer-events:auto;transition:opacity .6s;animation:respire 2.4s ease-in-out infinite}
+@keyframes respire{0%,100%{opacity:.35}50%{opacity:.9}}
+#jaide{font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#ffe0b0;text-shadow:0 1px 2px #000;min-height:1.2em;transition:opacity .8s}
+
+#breath{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;opacity:0;transition:opacity 1.2s}
+#breath.show{opacity:1;pointer-events:auto}
+#ringwrap{position:relative;width:40vmin;height:40vmin;display:flex;align-items:center;justify-content:center}
+#ring{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(255,236,200,.55);box-shadow:0 0 50px rgba(255,210,150,.25),inset 0 0 50px rgba(255,210,150,.15)}
+#blabel{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:28px;color:#fff0d8;letter-spacing:.05em}
+#bsub{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,236,220,.6)}
+
+#hud{position:absolute;top:calc(12px + env(safe-area-inset-top));right:calc(12px + env(safe-area-inset-right));display:flex;gap:10px;pointer-events:auto;transition:opacity .8s}
+#hud.hidden{opacity:0;pointer-events:none}
+#hud button{font:inherit;font-size:13px;letter-spacing:.08em;color:#f6e2d0;background:rgba(20,10,6,.5);border:0;padding:7px 10px;box-shadow:0 -2px 0 #7a4e38,0 2px 0 #7a4e38,-2px 0 0 #7a4e38,2px 0 0 #7a4e38;cursor:pointer}
+#hud button.on{color:#ffe0a6}
+#hud button.off{opacity:.45;text-decoration:line-through}
+
+.ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:24px;background:#000;transition:opacity 1.6s;pointer-events:auto;cursor:pointer}
+.ov.gone{opacity:0;pointer-events:none}
+.ov .small{font-size:12px;letter-spacing:.32em;color:#c9906a;text-transform:uppercase}
+.ov .big{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:500;font-size:clamp(44px,6.5vw,88px);color:#fff1e2;text-shadow:0 0 32px rgba(255,160,90,.35);line-height:1.05}
+.ov .sub{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:clamp(18px,1.5vw + 10px,24px);color:#d9bba2;max-width:28em;line-height:1.35}
+.ov .tap{margin-top:30px;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:#ffdca0;animation:respire 2s ease-in-out infinite}
+.ov button{margin-top:26px;font:inherit;font-size:16px;letter-spacing:.1em;color:#ffe0a6;background:rgba(40,22,14,.9);border:0;padding:12px 22px;cursor:pointer;box-shadow:0 -3px 0 #a87452,0 3px 0 #a87452,-3px 0 0 #a87452,3px 0 0 #a87452}
+#charge{position:absolute;left:0;right:0;bottom:22%;text-align:center;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#8a6a56}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="scene"><canvas id="cvFond"></canvas><canvas id="cvPerso"></canvas><canvas id="cvFx"></canvas></div>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+  <div id="jouet"><div id="jcadre"><div class="fleche" id="fg">‹</div><canvas id="jcv"></canvas><div class="fleche" id="fd">›</div></div><div id="jaide"></div></div>
+  <div id="ui">
+    <div id="voix"></div>
+    <div id="breath"><div id="ringwrap"><div id="ring"></div><div id="blabel">inspire…</div></div><div id="bsub">touche pour revenir</div></div>
+    <div id="hud" class="hidden"><button id="bSouffle" type="button">◯ souffle</button><button id="bSon" type="button">♪ son</button></div>
+    <div id="titre" class="ov">
+      <div class="small">Souvenir n°1 · 1984</div>
+      <div class="big">Le petit avion</div>
+      <div class="tap" id="tap">Touchez pour commencer</div>
+      <div id="charge"></div>
+    </div>
+    <div id="fin" class="ov gone">
+      <div class="small">Fin du souvenir n°1</div>
+      <div class="big">Le petit avion</div>
+      <div class="sub">La suite : le souvenir n°2.</div>
+      <button id="rejouer" type="button">↺ Rejouer</button>
+    </div>
+  </div>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const stage=$('stage'),scene=$('scene'),cvFond=$('cvFond'),cvPerso=$('cvPerso'),cvFx=$('cvFx'),
+  cF=cvFond.getContext('2d'),cP=cvPerso.getContext('2d'),cX=cvFx.getContext('2d'),grainEl=$('grain'),voixEl=$('voix'),
+  jouetEl=$('jouet'),jcv=$('jcv'),jcx=jcv.getContext('2d'),jaide=$('jaide'),breathEl=$('breath'),ringEl=$('ring'),blabelEl=$('blabel'),
+  hudEl=$('hud'),titreEl=$('titre'),finEl=$('fin'),vignette=$('vignette');
+const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t,easeIO=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ================= images du souvenir ================= */
+const A='assets/s01/';
+const NOMS=['fragment','groupe','avion_seul','avion_gauche','avion_profil','avion_droite','entree_basse','grand_mere'];
+const IMG={};let PL=null;
+function charger(){
+  const promesses=NOMS.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>r();i.onerror=()=>r();i.src=A+n+'.webp';IMG[n]=i;}));
+  promesses.push(fetch(A+'plans.json').then(r=>r.json()).then(j=>{PL=j;}));
+  let fait=0;promesses.forEach(p=>p.then(()=>{fait++;$('charge').textContent=fait<promesses.length?`chargement ${Math.round(fait/promesses.length*100)} %`:'';}));
+  return Promise.all(promesses);
+}
+// où l'on pose les personnages dans les décors (coordonnées des images de décor, 1536 × 1024)
+const MONDE={w:1536,h:1024};
+const GROUPE={cx:770,pieds:742,s:.56};  // la femme qui porte Yoann, et son frère
+function posGroupe(){const g=PL.groupe,w=g.w*GROUPE.s,h=g.h*GROUPE.s;return{x:GROUPE.cx-w/2,y:GROUPE.pieds-h,w,h};}
+const LAMPE_FRAGMENT=[756,124],LAMPE_BASSE=[842,102];
+const GRAND_MERE={cx:842,haut:300,h:610};
+function boiteAvion(){const g=PL.groupe.box,a=PL.avion_seul.box,s=GROUPE.s,p=posGroupe();
+  return{x:p.x+(a[0]-g[0])*s,y:p.y+(a[1]-g[1])*s,w:(a[2]-a[0])*s,h:(a[3]-a[1])*s};}
+
+/* ================= blocs de pixels : apparitions et effacements ================= */
+const DOUX=.06;
+function ordre(img,B,graine,fn,freq=3,taille=1){const iw=img.naturalWidth||img.width,ih=img.naturalHeight||img.height,cols=Math.ceil(iw/B),rows=Math.ceil(ih/B),t=new Float32Array(cols*rows),r=mulberry32(graine);let max=0;
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const v=fn((i+.5)/cols,(j+.5)/rows,r(),r());t[j*cols+i]=v;if(v<1.5&&v>max)max=v;}
+  return{t,cols,rows,B,max,v:0,parti:new Uint8Array(cols*rows),freq,taille};}
+function blocs(ctx,img,o,x,y,w,h,alpha=1,envol=null){
+  const iw=img&&(img.naturalWidth||img.width),ih=img&&(img.naturalHeight||img.height);
+  if(!iw||o.v<=0||alpha<=0)return;
+  if(o.v>=o.max+DOUX&&!envol){ctx.globalAlpha=alpha;ctx.drawImage(img,x,y,w,h);ctx.globalAlpha=1;return;}
+  const sx=w/iw,sy=h/ih,B=o.B;
+  for(let j=0;j<o.rows;j++)for(let i=0;i<o.cols;i++){const k=j*o.cols+i,t=o.t[k];
+    if(t>=o.v){if(envol&&!o.parti[k]&&t<1.5){o.parti[k]=1;if((i*7+j*13)%o.freq===0)envol(x+(i+.5)*B*sx,y+(j+.5)*B*sy,o.taille);}continue;}
+    o.parti[k]=0;const a=Math.min(1,(o.v-t)/DOUX)*alpha,bx=i*B,by=j*B,bw=Math.min(B,iw-bx),bh=Math.min(B,ih-by);
+    ctx.globalAlpha=a;ctx.drawImage(img,bx,by,bw,bh,x+bx*sx,y+by*sy,bw*sx+.7,bh*sy+.7);}
+  ctx.globalAlpha=1;}
+const O={};
+const plein=o=>o.max+DOUX+.01;
+function preparerOrdres(){
+  const P0=[1030/1536,60/1024,1190/1536,640/1024];
+  // l'entrée apparaît par petites touches : la porte, puis le mur, puis le sol ; quelques trous ne reviennent jamais
+  O.fragment=ordre(IMG.fragment,32,7,(u,v,r,r2)=>{if(r2<.045)return 2;if(u>P0[0]&&u<P0[2]&&v>P0[1]&&v<P0[3])return .04+r*.24;return v<.5?.3+r*.33:.56+r*.38;});
+  O.groupe=ordre(IMG.groupe,14,11,(u,v,r)=>r*.92,7,.45);
+  O.avion=ordre(IMG.avion_seul,8,13,(u,v,r)=>r*.9,4,.4);
+  O.basse=ordre(IMG.entree_basse,32,17,(u,v,r,r2)=>{const d=Math.hypot(u-.5,(v-.42)*1.2)/.62;if(d>.82&&r2<.3)return 2;return clamp(d,0,1)*.72+r*.25;});
+  // la grand-mère se fond dans le bas : une version dont la taille s'efface en dégradé
+  if(!IMG.mere_fondue){const c=document.createElement('canvas'),i=IMG.grand_mere;c.width=i.naturalWidth;c.height=i.naturalHeight;const x=c.getContext('2d');x.drawImage(i,0,0);
+    x.globalCompositeOperation='destination-in';const g=x.createLinearGradient(0,c.height*.62,0,c.height);g.addColorStop(0,'#000');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,c.width,c.height);IMG.mere_fondue=c;}
+  O.mere=ordre(IMG.mere_fondue,20,19,(u,v,r)=>{const d=Math.hypot(u-.5,v-.35);return clamp(d,0,1)*.5+r*.45;},5,.6);
+  for(const n of['avion_gauche','avion_profil','avion_droite'])O[n]=ordre(IMG[n],22,23+n.length,(u,v,r)=>r*.95);
+}
+
+/* ================= état, temps, caméra ================= */
+const S={plan:0,souffle:false,souffleT0:0,started:false,voixOn:0,voixSkip:false,ts:1,
+  fond:'fragment',fondA:1,persoA:1,flouFond:0,flouPerso:0,lampe:0,bob:0,avionSeul:0,merA:1,vignette:.7};
+const cam={x:760,y:520,z:1,tx:760,ty:520,tz:1};
+let W=0,H=0,DPR=1,s0=1,gt=0,rt=0;
+const timers=[],conds=[],tweens=[];
+const wait=ms=>new Promise(r=>timers.push({t:gt+ms/1000,r}));
+const until=fn=>new Promise(r=>conds.push({fn,r}));
+const tween=(o,k,b,d,ease=easeIO)=>new Promise(r=>{for(let i=tweens.length-1;i>=0;i--)if(tweens[i].o===o&&tweens[i].k===k)tweens.splice(i,1);tweens.push({o,k,a:o[k],b,d,t:0,r,ease});});
+const lin=t=>t;
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);
+  for(const c of[cvFond,cvPerso,cvFx]){c.width=Math.round(W*DPR);c.height=Math.round(H*DPR);c.style.width=W+'px';c.style.height=H+'px';}
+  // couvrir l'écran ; en portrait, garder au moins 62 % de la largeur de l'image (bandes noires dessus/dessous, comme un fragment dans le noir)
+  s0=Math.max(W/MONDE.w,H/MONDE.h);s0=Math.min(s0,W/(MONDE.w*.62));tailleJouet();}
+function centre(){const sc=s0*cam.z,vw=W/sc,vh=H/sc;
+  return[vw>=MONDE.w?MONDE.w/2:clamp(cam.x,vw/2,MONDE.w-vw/2),vh>=MONDE.h?MONDE.h/2:clamp(cam.y,vh/2,MONDE.h-vh/2),sc];}
+function poserCamera(ctx,par=1){let[cx,cy,sc]=centre();cx=MONDE.w/2+(cx-MONDE.w/2)*par;ctx.setTransform(DPR*sc,0,0,DPR*sc,DPR*(W/2-cx*sc),DPR*(H/2-cy*sc));}
+
+/* ================= poussière et pixels qui s'envolent ================= */
+let parts=[];
+function envol(x,y,t=1){if(parts.length>700)return;parts.push({x,y,vx:(Math.random()-.5)*30,vy:-20-Math.random()*40,vie:(1.6+Math.random()*1.4)*(t<1?.6:1),max:3,s:(6+Math.random()*10)*t,c:Math.random()<.5?'255,196,130':'200,140,90'});}
+function poussiere(){if(parts.length<120&&Math.random()<.25){const[lx,ly]=S.fond==='fragment'?LAMPE_FRAGMENT:LAMPE_BASSE;parts.push({x:lx+(Math.random()-.5)*700,y:ly+200+Math.random()*600,vx:(Math.random()-.5)*6,vy:-6-Math.random()*8,vie:5+Math.random()*4,max:9,s:3+Math.random()*4,c:'255,226,180',p:1});}}
+
+/* ================= dessin ================= */
+function glow(ctx,x,y,r,rgb,a){if(r<=0||a<=.003)return;const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(.35,`rgba(${rgb},${a*.45})`);g.addColorStop(1,`rgba(${rgb},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,6.2832);ctx.fill();}
+function dessiner(dt){
+  // le décor
+  cF.setTransform(1,0,0,1,0,0);cF.clearRect(0,0,cvFond.width,cvFond.height);
+  poserCamera(cF,.97);
+  if(S.fond==='fragment')blocs(cF,IMG.fragment,O.fragment,0,0,MONDE.w,MONDE.h,S.fondA,S.plan===5?envol:null);
+  else if(S.fond==='basse')blocs(cF,IMG.entree_basse,O.basse,0,0,MONDE.w,MONDE.h,S.fondA,envol);
+  // les personnages
+  cP.setTransform(1,0,0,1,0,0);cP.clearRect(0,0,cvPerso.width,cvPerso.height);
+  poserCamera(cP,1);
+  if(S.fond==='fragment'){const p=posGroupe();
+    blocs(cP,IMG.groupe,O.groupe,p.x,p.y,p.w,p.h,S.persoA,S.plan===5?envol:null);
+    const b=boiteAvion(),bob=Math.sin(rt*2.2)*1.6*S.bob,rot=Math.sin(rt*1.7+1)*.035*S.bob;
+    cP.save();cP.translate(b.x+b.w/2,b.y+b.h/2+bob);cP.rotate(rot);
+    if(S.avionSeul>0){cP.globalCompositeOperation='lighter';glow(cP,0,0,b.w*1.6,'255,250,235',.22*S.avionSeul);cP.globalCompositeOperation='source-over';}
+    blocs(cP,IMG.avion_seul,O.avion,-b.w/2,-b.h/2,b.w,b.h,S.plan===5?1:S.persoA,S.plan===5?envol:null);cP.restore();}
+  if(S.fond==='basse'){const m=PL.grand_mere,h=GRAND_MERE.h,w=m.w*h/m.h;
+    blocs(cP,IMG.mere_fondue,O.mere,GRAND_MERE.cx-w/2,GRAND_MERE.haut,w,h,S.merA,envol);}
+  // la lumière, la poussière, les pixels qui s'envolent
+  cX.setTransform(1,0,0,1,0,0);cX.clearRect(0,0,cvFx.width,cvFx.height);poserCamera(cX,1);cX.globalCompositeOperation='lighter';
+  const[lx,ly]=S.fond==='fragment'?LAMPE_FRAGMENT:LAMPE_BASSE,fl=.9+.1*Math.sin(rt*2.1)*Math.sin(rt*.7+1);
+  glow(cX,lx,ly,S.fond==='fragment'?260:420,'255,190,110',.28*S.lampe*fl);glow(cX,lx,ly,70,'255,236,190',.4*S.lampe*fl);
+  if(S.lampe>.5)poussiere();
+  for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.vie-=dt;if(p.vie<=0){parts.splice(i,1);continue;}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy-=4*dt;
+    const k=Math.min(1,p.vie/p.max*1.5)*(p.p?.35*(.5+.5*Math.sin(rt*1.3+p.x)):.75);cX.fillStyle=`rgba(${p.c},${k.toFixed(3)})`;cX.fillRect(Math.round(p.x),Math.round(p.y),p.s,p.s);}
+  cX.globalCompositeOperation='source-over';
+  const ff=S.flouFond*s0*cam.z*.9;cvFond.style.filter=ff>.3?`blur(${ff.toFixed(1)}px)`:'none';
+  const fp=S.flouPerso*s0*cam.z*.9;cvPerso.style.filter=fp>.3?`blur(${fp.toFixed(1)}px)`:'none';
+  vignette.style.opacity=S.vignette.toFixed(2);
+}
+
+/* ================= le son : un souffle, quelques notes, un clic ================= */
+const SON={c:null,on:true};
+function sonInit(){if(SON.c){SON.c.resume&&SON.c.resume();return;}const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;let c;try{c=new AC();}catch(e){return;}SON.c=c;
+  const m=c.createGain();m.gain.value=SON.on?.7:0;m.connect(c.destination);SON.m=m;
+  const dl=c.createDelay(2);dl.delayTime.value=.42;const fb=c.createGain();fb.gain.value=.45;const dlp=c.createBiquadFilter();dlp.type='lowpass';dlp.frequency.value=2200;dl.connect(dlp);dlp.connect(fb);fb.connect(dl);dlp.connect(m);SON.envoi=dl;
+  const len=c.sampleRate*3,b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);let b0=0;for(let i=0;i<len;i++){b0=.98*b0+.06*(Math.random()*2-1);d[i]=b0;}SON.bruit=b;
+  const src=c.createBufferSource();src.buffer=b;src.loop=true;const bp=c.createBiquadFilter();bp.type='bandpass';bp.frequency.value=380;bp.Q.value=.6;
+  SON.souffle=c.createGain();SON.souffle.gain.value=0;const l=c.createOscillator();l.frequency.value=.11;const lg=c.createGain();lg.gain.value=.5;const lo=c.createGain();lo.gain.value=0;
+  l.connect(lg);lg.connect(lo.gain);src.connect(bp);bp.connect(lo);lo.connect(SON.souffle);const base=c.createGain();base.gain.value=.5;bp.connect(base);base.connect(SON.souffle);SON.souffle.connect(m);src.start();l.start();}
+function souffleAmb(v,t=2){if(!SON.c)return;SON.souffle.gain.setTargetAtTime(v,SON.c.currentTime,t);}
+function note(f,vol=1,dur=3.2){if(!SON.c||!SON.on)return;const c=SON.c,t=c.currentTime;[[f,'sine',.07],[f*2.003,'triangle',.016],[f*.5,'sine',.03]].forEach(([fr,ty,g0])=>{const o=c.createOscillator();o.type=ty;o.frequency.value=fr;const g=c.createGain();
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(g0*vol,t+.35);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(SON.m);g.connect(SON.envoi);o.start(t);o.stop(t+dur+.1);});}
+function clic(){if(!SON.c||!SON.on)return;const c=SON.c,t=c.currentTime,s=c.createBufferSource();s.buffer=SON.bruit;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=3600;f.Q.value=4;
+  const g=c.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.5,t+.003);g.gain.exponentialRampToValueAtTime(.0001,t+.04);s.connect(f);f.connect(g);g.connect(SON.m);s.start(t,Math.random());s.stop(t+.06);}
+
+/* ================= la voix off ================= */
+function voix(texte,tenue){return new Promise(async res=>{voixEl.textContent=texte;voixEl.classList.add('show');S.voixOn=gt||.001;S.voixSkip=false;
+  const fin=gt+tenue;await until(()=>gt>=fin||S.voixSkip);voixEl.classList.remove('show');S.voixOn=0;await wait(1300);res();});}
+
+/* ================= séquence 03 : l'avion qu'on fait pivoter ================= */
+const VUES=['avion_gauche','avion_profil','avion_droite'];
+const J={vue:1,coups:0,actif:false,v:.32,res:null};
+function tailleJouet(){if(!PL)return;const m=PL[VUES[J.vue]],k=Math.min(W*.64/m.w,H*.5/m.h);jcv.width=Math.round(m.w*k*DPR);jcv.height=Math.round(m.h*k*DPR);jcv.style.width=(m.w*k)+'px';jcv.style.height=(m.h*k)+'px';}
+function dessinerJouet(){if(!PL||!O.avion_profil)return;const n=VUES[J.vue];jcx.setTransform(1,0,0,1,0,0);jcx.clearRect(0,0,jcv.width,jcv.height);O[n].v=J.v;blocs(jcx,IMG[n],O[n],0,0,jcv.width,jcv.height,1);}
+function pivoter(dir){if(!J.actif)return;J.vue=(J.vue+dir+3)%3;J.coups++;clic();tailleJouet();
+  jcv.style.transition='none';jcv.style.transform=`scaleX(.78) rotate(${dir*4}deg)`;requestAnimationFrame(()=>{jcv.style.transition='';jcv.style.transform='';});
+  tween(J,'v',Math.min(1.05,.32+J.coups*.26),.9);
+  if(J.coups===1)jaide.style.opacity='0';
+  if(J.coups>=3){J.actif=false;$('fg').style.opacity=$('fd').style.opacity='0';setTimeout(()=>J.res&&J.res(),900);}}
+function jeuAvion(){return new Promise(res=>{Object.assign(J,{vue:1,coups:0,actif:true,v:0,res});tailleJouet();jaide.textContent='Fais-le pivoter';jaide.style.opacity='1';
+  $('fg').style.opacity=$('fd').style.opacity='';jouetEl.classList.add('show');tween(J,'v',.32,1.6);});}
+let glisse=null;
+jouetEl.addEventListener('pointerdown',e=>{glisse={x:e.clientX,fait:false};});
+addEventListener('pointermove',e=>{if(!glisse||glisse.fait||!J.actif)return;const dx=e.clientX-glisse.x;if(Math.abs(dx)>34){glisse.fait=true;pivoter(dx>0?-1:1);}});
+addEventListener('pointerup',()=>{glisse=null;});
+$('fg').addEventListener('pointerdown',e=>e.stopPropagation());$('fd').addEventListener('pointerdown',e=>e.stopPropagation());
+$('fg').addEventListener('click',e=>{e.stopPropagation();pivoter(-1);});
+$('fd').addEventListener('click',e=>{e.stopPropagation();pivoter(1);});
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')pivoter(-1);else if(e.key==='ArrowRight')pivoter(1);else if(e.key===' '||e.key==='Enter'){if(S.voixOn)S.voixSkip=true;}});
+
+/* ================= le souffle (pause apaisante) ================= */
+function souffle(on){S.souffle=on;if(on)S.souffleT0=rt;breathEl.classList.toggle('show',on);scene.classList.toggle('doux',on);$('bSouffle').classList.toggle('on',on);}
+function majSouffle(){const p=(rt-S.souffleT0)%10;let s,l;if(p<4){s=.55+.45*easeIO(p/4);l='inspire…';}else{s=1-.45*easeIO((p-4)/6);l='expire…';}
+  ringEl.style.transform=`scale(${s.toFixed(3)})`;if(blabelEl.textContent!==l)blabelEl.textContent=l;}
+
+/* ================= le souvenir n°1, d'après le script de Yoann ================= */
+async function jouer(){
+  preparerOrdres();parts=[];
+  Object.assign(S,{plan:1,fond:'fragment',fondA:1,persoA:1,flouFond:0,flouPerso:0,lampe:0,bob:0,avionSeul:0,merA:1,vignette:.7});
+  Object.assign(cam,{x:760,y:520,z:1.12,tx:760,ty:520,tz:1.12});
+  hudEl.classList.remove('hidden');
+  // 01 — Apparition
+  await wait(1500);souffleAmb(.12,3);
+  tween(O.fragment,'v',plein(O.fragment),8,lin);
+  await wait(1800);
+  await voix('Je crois que c’est mon tout premier souvenir.',3.2);
+  tween(S,'lampe',1,3);
+  await wait(500);
+  tween(O.groupe,'v',plein(O.groupe),3.4,lin);tween(O.avion,'v',plein(O.avion),3.4,lin);
+  await voix('Je devais avoir deux ou trois ans.',3);
+  // 02 — La visite
+  S.plan=2;tween(S,'bob',1,2);cam.tz=1.25;
+  await voix('On était chez ma grand-mère.',2.8);
+  await wait(500);
+  await voix('Mon grand frère était là aussi.',2.8);
+  await wait(400);
+  await voix('J’étais dans les bras de quelqu’un. Je ne sais plus qui.',3.4);
+  const b=boiteAvion();cam.tx=b.x+b.w/2;cam.ty=b.y+b.h/2;cam.tz=2.6;tween(S,'flouFond',6,5);tween(S,'vignette',1,4);
+  await voix('Je me souviens surtout d’un jouet. Un Transformer blanc.',3.8);
+  await wait(400);
+  await voix('Je crois qu’il se transformait en avion.',3);
+  // 03 — Le petit avion
+  S.plan=3;tween(S,'fondA',0,1.6);tween(S,'persoA',0,1.6);tween(S,'lampe',0,1.6);souffleAmb(.06,2);
+  await wait(900);
+  await jeuAvion();
+  await voix('C’est étrange, les détails qu’on retient.',3.4);
+  await wait(1800);
+  jouetEl.classList.remove('show');await wait(1500);
+  // 04 — Ma grand-mère
+  S.plan=4;S.fond='basse';S.fondA=1;S.flouFond=0;S.vignette=.75;O.basse.v=0;O.mere.v=0;S.lampe=0;
+  Object.assign(cam,{x:842,y:470,z:1.04,tx:842,ty:450,tz:1.1});
+  tween(O.basse,'v',plein(O.basse),2.6,lin);tween(S,'lampe',1,2.5);souffleAmb(.1,2);
+  await wait(2000);
+  tween(O.mere,'v',plein(O.mere),3.2,lin);note(392,1,4.5);await wait(900);note(587.33,.8,4.5);
+  await wait(1200);
+  tween(O.basse,'v',.78,12,lin);// les contours du décor commencent à s'effacer
+  await voix('Je n’ai presque aucun autre souvenir de ma grand-mère.',3.8);
+  await wait(500);
+  note(659.25,.7,5);
+  await voix('Je me rappelle surtout qu’elle souriait beaucoup.',3.8);
+  await wait(2600);
+  tween(O.mere,'v',0,3.2,lin);note(493.88,.6,4);
+  await wait(3600);
+  // 05 — L'effacement
+  S.plan=5;tween(S,'lampe',0,1.2);tween(S,'fondA',0,1.2);await wait(1300);
+  S.fond='fragment';S.fondA=1;S.persoA=1;S.flouFond=0;S.vignette=.7;S.lampe=.8;S.bob=.6;
+  O.fragment.v=plein(O.fragment);O.groupe.v=plein(O.groupe);O.avion.v=plein(O.avion);
+  O.fragment.parti.fill(0);O.groupe.parti.fill(0);O.avion.parti.fill(0);
+  Object.assign(cam,{x:760,y:520,z:1.12,tx:760,ty:520,tz:1.12});
+  await wait(1200);
+  tween(O.fragment,'v',.3,4.5,lin);// les murs, par blocs
+  await wait(4600);
+  tween(O.fragment,'v',0,2.4,lin);tween(S,'lampe',0,2.4);// puis la porte
+  await wait(2500);
+  tween(O.groupe,'v',0,2.2,lin);// puis les personnages ; l'avion reste
+  const bb=boiteAvion();cam.tx=bb.x+bb.w/2;cam.ty=bb.y+bb.h/2;cam.tz=2.8;
+  await wait(1800);tween(S,'avionSeul',1,2);
+  await wait(2200);
+  await voix('Je ne sais pas pourquoi j’ai gardé cette image-là.',3.6);
+  await wait(1600);
+  tween(O.avion,'v',0,2.2,lin);tween(S,'avionSeul',0,2.2);souffleAmb(0,1.5);
+  await wait(5200);// noir, quelques secondes, silence complet
+  await voix('Mais c’est par là que mes souvenirs commencent.',4);
+  await wait(800);
+  finEl.classList.remove('gone');
+}
+
+/* ================= entrées ================= */
+function demarrer(){if(S.started||!PL)return;S.started=true;sonInit();
+  try{const de=document.documentElement,fn=de.requestFullscreen||de.webkitRequestFullscreen;if(fn){const p=fn.call(de);if(p&&p.catch)p.catch(()=>{});}}catch(e){}
+  titreEl.classList.add('gone');jouer();}
+titreEl.addEventListener('click',demarrer);
+$('rejouer').addEventListener('pointerdown',e=>e.stopPropagation());
+$('rejouer').addEventListener('click',e=>{e.stopPropagation();finEl.classList.add('gone');jouer();});
+stage.addEventListener('pointerdown',e=>{if(!S.started||S.souffle)return;if(S.voixOn&&gt-S.voixOn>.8)S.voixSkip=true;});
+for(const id of['bSouffle','bSon'])$(id).addEventListener('pointerdown',e=>e.stopPropagation());
+$('bSouffle').addEventListener('click',e=>{e.stopPropagation();souffle(!S.souffle);});
+$('bSon').addEventListener('click',e=>{e.stopPropagation();SON.on=!SON.on;$('bSon').classList.toggle('off',!SON.on);if(SON.c)SON.m.gain.setTargetAtTime(SON.on?.7:0,SON.c.currentTime,.3);});
+breathEl.addEventListener('pointerdown',e=>{e.stopPropagation();souffle(false);});
+document.addEventListener('visibilitychange',()=>{if(!SON.c)return;try{document.hidden?SON.c.suspend():SON.c.resume();}catch(e){}});
+addEventListener('resize',resize);
+(()=>{const c=document.createElement('canvas');c.width=c.height=160;const x=c.getContext('2d'),id=x.createImageData(160,160);
+  for(let i=0;i<id.data.length;i+=4){const v=Math.random()*255|0;id.data[i]=id.data[i+1]=id.data[i+2]=v;id.data[i+3]=255;}x.putImageData(id,0,0);grainEl.style.backgroundImage=`url(${c.toDataURL()})`;})();
+
+/* ================= la boucle ================= */
+const Q=new URLSearchParams(location.search),VITE=Number(Q.get('vite'))||1;
+let last=performance.now(),grainAcc=0;
+function boucle(now){const rdt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;rt+=rdt;
+  S.ts+=((S.souffle?.25:1)-S.ts)*(1-Math.exp(-rdt*2.2));const dt=rdt*S.ts*VITE;gt+=dt;
+  for(let i=timers.length-1;i>=0;i--)if(gt>=timers[i].t){const r=timers[i].r;timers.splice(i,1);r();}
+  for(let i=conds.length-1;i>=0;i--)if(conds[i].fn()){const r=conds[i].r;conds.splice(i,1);r();}
+  for(let i=tweens.length-1;i>=0;i--){const w=tweens[i];w.t+=dt;const k=Math.min(1,w.t/w.d);w.o[w.k]=lerp(w.a,w.b,w.ease(k));if(k>=1){tweens.splice(i,1);w.r();}}
+  // la caméra flotte lentement autour du fragment
+  const k=1-Math.exp(-rdt*.9*Math.max(1,VITE*.5));cam.x+=(cam.tx+Math.sin(rt*.13)*14-cam.x)*k;cam.y+=(cam.ty+Math.sin(rt*.11+1)*8-cam.y)*k;cam.z+=(cam.tz*(1+Math.sin(rt*.09)*.012)-cam.z)*k;
+  if(S.started&&PL&&O.fragment)dessiner(dt);
+  if(jouetEl.classList.contains('show'))dessinerJouet();
+  grainAcc+=rdt;if(grainAcc>=1/24){grainAcc=0;grainEl.style.backgroundPosition=`${(Math.random()*160)|0}px ${(Math.random()*160)|0}px`;}
+  if(S.souffle)majSouffle();
+  requestAnimationFrame(boucle);}
+if(Q.has('debug'))window.__dbg={S,J,O,cam,pivoter,get gt(){return gt}};
+$('tap').style.visibility='hidden';
+charger().then(()=>{resize();$('tap').style.visibility='';});
+resize();requestAnimationFrame(boucle);
+})();
+</script>
+</body>
+</html>
