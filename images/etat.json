@@ -1,5 +1,5 @@
 {
-  "total": 0.1524,
+  "total": 0.2078,
   "images": {
     "s01/fond": {
       "empreinte": "8000b6a9f435c9be",
@@ -18,6 +18,12 @@
       "cout": 0.0549,
       "recue": "1536x1024",
       "date": "2026-11-16 16:23 UTC"
+    },
+    "s01/porteur_enfant": {
+      "empreinte": "82c46c3a4c3af11f",
+      "cout": 0.0554,
+      "recue": "1536x1024",
+      "date": "2026-11-16 16:28 UTC"
     }
   }
 }
