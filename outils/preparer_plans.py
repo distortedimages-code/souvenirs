@@ -17,6 +17,7 @@ from PIL import Image, ImageFilter
 
 RACINE = Path(__file__).resolve().parent.parent
 SRC = RACINE / 'images' / 'generees' / 's01'
+RETOUCHES = RACINE / 'images' / 'retouches' / 's01'   # corrections faites à la main (ex. un pied dans le mauvais sens)
 DST = RACINE / 'jeu' / 'assets' / 's01'
 
 
@@ -89,18 +90,16 @@ def tramer_visage(rgb, alpha, zone, bloc=22):
 def main():
     DST.mkdir(parents=True, exist_ok=True)
     info = {}
-    lire = lambda n: np.asarray(Image.open(SRC / f'{n}.png').convert('RGB'), dtype=np.float32)
+    def lire(n):  # la version retouchée à la main passe avant l'image générée
+        f = RETOUCHES / f'{n}.png'
+        return np.asarray(Image.open(f if f.is_file() else SRC / f'{n}.png').convert('RGB'), dtype=np.float32)
 
     for n in ('fragment', 'entree_basse'):
         rgb = lire(n); sauver(rgb, None, n); info[n] = {'w': rgb.shape[1], 'h': rgb.shape[0]}
 
-    # les deux garçons, et l'avion découpé à part
-    rgb, a = detourer(lire('garcons'))
-    ys, xs = np.where(a > .5)
-    # l'avion : pixels clairs et peu colorés, dans le quart gauche des personnages, à hauteur des mains
-    gx0, gx1, gy0, gy1 = xs.min(), xs.max(), ys.min(), ys.max()
-    x0, y0 = int(gx0), int(gy0 + (gy1 - gy0) * .44)
-    x1, y1 = int(gx0 + (gx1 - gx0) * .30), int(gy0 + (gy1 - gy0) * .64)
+    # le groupe : la femme qui porte Yoann et son frère ; l'avion, repéré dans les mains de Yoann, est découpé à part
+    rgb, a = detourer(lire('porteuse'))
+    x0, y0, x1, y1 = 630, 270, 780, 400   # zone des mains de Yoann dans l'image du groupe
     # l'avion se distingue des mains par sa teinte : crème (vert et bleu hauts), la peau est plus orangée
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     creme = (r > 165) & (g / np.maximum(r, 1) > .755) & (b / np.maximum(r, 1) > .46) & (a > .5)
@@ -116,8 +115,8 @@ def main():
     trou = cv2.dilate((m_avion * 255).astype(np.uint8), np.ones((5, 5), np.uint8))
     rgb = cv2.inpaint(np.clip(rgb, 0, 255).astype(np.uint8), trou, 6, cv2.INPAINT_TELEA).astype(np.float32)
     g_rgb, g_a, g_box = recadrer(rgb, a)
-    sauver(g_rgb, g_a, 'garcons'); sauver(av_rgb, av_a, 'avion_seul')
-    info['garcons'] = {'w': g_rgb.shape[1], 'h': g_rgb.shape[0], 'box': g_box}
+    sauver(g_rgb, g_a, 'groupe'); sauver(av_rgb, av_a, 'avion_seul')
+    info['groupe'] = {'w': g_rgb.shape[1], 'h': g_rgb.shape[0], 'box': g_box}
     info['avion_seul'] = {'w': av_rgb.shape[1], 'h': av_rgb.shape[0], 'box': av_box}
 
     # l'avion en gros plan, sous trois angles

@@ -93,7 +93,7 @@ function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a
 
 /* ================= images du souvenir ================= */
 const A='assets/s01/';
-const NOMS=['fragment','garcons','avion_seul','avion_gauche','avion_profil','avion_droite','entree_basse','grand_mere'];
+const NOMS=['fragment','groupe','avion_seul','avion_gauche','avion_profil','avion_droite','entree_basse','grand_mere'];
 const IMG={};let PL=null;
 function charger(){
   const promesses=NOMS.map(n=>new Promise(r=>{const i=new Image();i.onload=()=>r();i.onerror=()=>r();i.src=A+n+'.webp';IMG[n]=i;}));
@@ -103,11 +103,12 @@ function charger(){
 }
 // où l'on pose les personnages dans les décors (coordonnées des images de décor, 1536 × 1024)
 const MONDE={w:1536,h:1024};
-const GARCONS={x:640,y:398,s:.44};
+const GROUPE={cx:770,pieds:742,s:.56};  // la femme qui porte Yoann, et son frère
+function posGroupe(){const g=PL.groupe,w=g.w*GROUPE.s,h=g.h*GROUPE.s;return{x:GROUPE.cx-w/2,y:GROUPE.pieds-h,w,h};}
 const LAMPE_FRAGMENT=[756,124],LAMPE_BASSE=[842,102];
 const GRAND_MERE={cx:842,haut:300,h:610};
-function boiteAvion(){const g=PL.garcons.box,a=PL.avion_seul.box,s=GARCONS.s;
-  return{x:GARCONS.x+(a[0]-g[0])*s,y:GARCONS.y+(a[1]-g[1])*s,w:(a[2]-a[0])*s,h:(a[3]-a[1])*s};}
+function boiteAvion(){const g=PL.groupe.box,a=PL.avion_seul.box,s=GROUPE.s,p=posGroupe();
+  return{x:p.x+(a[0]-g[0])*s,y:p.y+(a[1]-g[1])*s,w:(a[2]-a[0])*s,h:(a[3]-a[1])*s};}
 
 /* ================= blocs de pixels : apparitions et effacements ================= */
 const DOUX=.06;
@@ -130,7 +131,7 @@ function preparerOrdres(){
   const P0=[1030/1536,60/1024,1190/1536,640/1024];
   // l'entrée apparaît par petites touches : la porte, puis le mur, puis le sol ; quelques trous ne reviennent jamais
   O.fragment=ordre(IMG.fragment,32,7,(u,v,r,r2)=>{if(r2<.045)return 2;if(u>P0[0]&&u<P0[2]&&v>P0[1]&&v<P0[3])return .04+r*.24;return v<.5?.3+r*.33:.56+r*.38;});
-  O.garcons=ordre(IMG.garcons,14,11,(u,v,r)=>r*.92,7,.45);
+  O.groupe=ordre(IMG.groupe,14,11,(u,v,r)=>r*.92,7,.45);
   O.avion=ordre(IMG.avion_seul,8,13,(u,v,r)=>r*.9,4,.4);
   O.basse=ordre(IMG.entree_basse,32,17,(u,v,r,r2)=>{const d=Math.hypot(u-.5,(v-.42)*1.2)/.62;if(d>.82&&r2<.3)return 2;return clamp(d,0,1)*.72+r*.25;});
   // la grand-mère se fond dans le bas : une version dont la taille s'efface en dégradé
@@ -174,8 +175,8 @@ function dessiner(dt){
   // les personnages
   cP.setTransform(1,0,0,1,0,0);cP.clearRect(0,0,cvPerso.width,cvPerso.height);
   poserCamera(cP,1);
-  if(S.fond==='fragment'){const g=PL.garcons,w=g.w*GARCONS.s,h=g.h*GARCONS.s;
-    blocs(cP,IMG.garcons,O.garcons,GARCONS.x,GARCONS.y,w,h,S.persoA,S.plan===5?envol:null);
+  if(S.fond==='fragment'){const p=posGroupe();
+    blocs(cP,IMG.groupe,O.groupe,p.x,p.y,p.w,p.h,S.persoA,S.plan===5?envol:null);
     const b=boiteAvion(),bob=Math.sin(rt*2.2)*1.6*S.bob,rot=Math.sin(rt*1.7+1)*.035*S.bob;
     cP.save();cP.translate(b.x+b.w/2,b.y+b.h/2+bob);cP.rotate(rot);
     if(S.avionSeul>0){cP.globalCompositeOperation='lighter';glow(cP,0,0,b.w*1.6,'255,250,235',.22*S.avionSeul);cP.globalCompositeOperation='source-over';}
@@ -253,13 +254,15 @@ async function jouer(){
   await voix('Je crois que c’est mon tout premier souvenir.',3.2);
   tween(S,'lampe',1,3);
   await wait(500);
-  tween(O.garcons,'v',plein(O.garcons),3.4,lin);tween(O.avion,'v',plein(O.avion),3.4,lin);
+  tween(O.groupe,'v',plein(O.groupe),3.4,lin);tween(O.avion,'v',plein(O.avion),3.4,lin);
   await voix('Je devais avoir deux ou trois ans.',3);
   // 02 — La visite
   S.plan=2;tween(S,'bob',1,2);cam.tz=1.25;
   await voix('On était chez ma grand-mère.',2.8);
   await wait(500);
   await voix('Mon grand frère était là aussi.',2.8);
+  await wait(400);
+  await voix('J’étais dans les bras de quelqu’un. Je ne sais plus qui.',3.4);
   const b=boiteAvion();cam.tx=b.x+b.w/2;cam.ty=b.y+b.h/2;cam.tz=2.6;tween(S,'flouFond',6,5);tween(S,'vignette',1,4);
   await voix('Je me souviens surtout d’un jouet. Un Transformer blanc.',3.8);
   await wait(400);
@@ -289,15 +292,15 @@ async function jouer(){
   // 05 — L'effacement
   S.plan=5;tween(S,'lampe',0,1.2);tween(S,'fondA',0,1.2);await wait(1300);
   S.fond='fragment';S.fondA=1;S.persoA=1;S.flouFond=0;S.vignette=.7;S.lampe=.8;S.bob=.6;
-  O.fragment.v=plein(O.fragment);O.garcons.v=plein(O.garcons);O.avion.v=plein(O.avion);
-  O.fragment.parti.fill(0);O.garcons.parti.fill(0);O.avion.parti.fill(0);
+  O.fragment.v=plein(O.fragment);O.groupe.v=plein(O.groupe);O.avion.v=plein(O.avion);
+  O.fragment.parti.fill(0);O.groupe.parti.fill(0);O.avion.parti.fill(0);
   Object.assign(cam,{x:760,y:520,z:1.12,tx:760,ty:520,tz:1.12});
   await wait(1200);
   tween(O.fragment,'v',.3,4.5,lin);// les murs, par blocs
   await wait(4600);
   tween(O.fragment,'v',0,2.4,lin);tween(S,'lampe',0,2.4);// puis la porte
   await wait(2500);
-  tween(O.garcons,'v',0,2.2,lin);// puis les personnages ; l'avion reste
+  tween(O.groupe,'v',0,2.2,lin);// puis les personnages ; l'avion reste
   const bb=boiteAvion();cam.tx=bb.x+bb.w/2;cam.ty=bb.y+bb.h/2;cam.tz=2.8;
   await wait(1800);tween(S,'avionSeul',1,2);
   await wait(2200);
