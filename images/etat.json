@@ -1,5 +1,5 @@
 {
-  "total": 0.4457,
+  "total": 0.8563,
   "images": {
     "s01/fond": {
       "empreinte": "b7a2522538ac32e5",
@@ -36,6 +36,48 @@
       "cout": 0.0426,
       "recue": "1536x1024",
       "date": "2026-11-16 17:33 UTC"
+    },
+    "s01/fragment": {
+      "empreinte": "09fdfbcd1d010963",
+      "cout": 0.055,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:22 UTC"
+    },
+    "s01/garcons": {
+      "empreinte": "be6ccb3b8fb619c5",
+      "cout": 0.0556,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:22 UTC"
+    },
+    "s01/avion_profil": {
+      "empreinte": "85fd7f19d14bcac4",
+      "cout": 0.0552,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:23 UTC"
+    },
+    "s01/avion_gauche": {
+      "empreinte": "88a5236f39a42453",
+      "cout": 0.0674,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:23 UTC"
+    },
+    "s01/avion_droite": {
+      "empreinte": "132b268cab079d48",
+      "cout": 0.0674,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:24 UTC"
+    },
+    "s01/entree_basse": {
+      "empreinte": "a6769d9ba86479e3",
+      "cout": 0.0548,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:24 UTC"
+    },
+    "s01/grand_mere": {
+      "empreinte": "f23948af22754325",
+      "cout": 0.0552,
+      "recue": "1536x1024",
+      "date": "2026-11-16 18:25 UTC"
     }
   }
 }
