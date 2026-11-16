@@ -2,8 +2,92 @@
   "version": 1,
   "taille": "1536x1024",
   "images": [
-    {"image": "s01/fond", "prompt": "prompts/s01/fond.txt", "references": []},
-    {"image": "s01/plan_moyen", "prompt": "prompts/s01/plan_moyen.txt", "references": ["s01/fond"], "magenta": true},
-    {"image": "s01/premier_plan", "prompt": "prompts/s01/premier_plan.txt", "references": ["s01/fond"], "magenta": true}
+    {
+      "image": "s01/fond",
+      "prompt": "prompts/s01/fond.txt",
+      "references": []
+    },
+    {
+      "image": "s01/plan_moyen",
+      "prompt": "prompts/s01/plan_moyen.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true
+    },
+    {
+      "image": "s01/premier_plan",
+      "prompt": "prompts/s01/premier_plan.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true
+    },
+    {
+      "image": "s01/porteur_enfant",
+      "prompt": "prompts/s01/porteur_enfant.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/mamie",
+      "prompt": "prompts/s01/mamie.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/mamie_rire",
+      "prompt": "prompts/s01/mamie_rire.txt",
+      "references": [
+        "s01/fond",
+        "s01/mamie"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/frere",
+      "prompt": "prompts/s01/frere.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/frere_tend",
+      "prompt": "prompts/s01/frere_tend.txt",
+      "references": [
+        "s01/fond",
+        "s01/frere"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/jouet_avion",
+      "prompt": "prompts/s01/jouet_avion.txt",
+      "references": [
+        "s01/fond"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    },
+    {
+      "image": "s01/jouet_robot",
+      "prompt": "prompts/s01/jouet_robot.txt",
+      "references": [
+        "s01/fond",
+        "s01/jouet_avion"
+      ],
+      "magenta": true,
+      "type": "personnage"
+    }
   ]
 }

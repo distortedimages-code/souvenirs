@@ -1,0 +1,23 @@
+{
+  "fond": {
+    "taille": [
+      384,
+      256
+    ],
+    "opaque": 1.0
+  },
+  "plan_moyen": {
+    "taille": [
+      384,
+      256
+    ],
+    "opaque": 0.077
+  },
+  "premier_plan": {
+    "taille": [
+      384,
+      256
+    ],
+    "opaque": 0.274
+  }
+}

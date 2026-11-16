@@ -24,6 +24,9 @@ PAR_REFERENCE = 0.03
 CONSIGNES = "Generate one single image: one frame. No collage, no split screen, no grid, no border, no caption."
 REFERENCE = ("The attached image is a reference for palette, lighting, perspective, pixel size and scale only. "
              "Do not copy its content; draw only what is described above, so it can be layered on top of it.")
+REFERENCE_PERSO = ("The first attached image is the background of the scene: use it only for palette, lighting, pixel size "
+                   "and scale, and do not draw it. Any other attached image shows a character or object that must stay "
+                   "exactly the same (face, hair, clothes, colours, proportions), as described above.")
 MAGENTA = ("Everything that is not part of the described objects must be a perfectly flat, solid magenta (#FF00FF), "
            "with no gradient, no shadow and no texture, so it can be removed.")
 
@@ -42,11 +45,14 @@ def maintenant():
 
 
 def construire_prompt(e):
-    morceaux = [lire(ICI / 'style_commun.txt'), lire(ICI / e['prompt'])]
+    perso = e.get('type') == 'personnage'
+    style = 'style_personnages.txt' if perso else 'style_commun.txt'
+    negatif = 'prompt_negatif_personnages.txt' if perso else 'prompt_negatif.txt'
+    morceaux = [lire(ICI / style), lire(ICI / e['prompt'])]
     if e.get('magenta'): morceaux.append(MAGENTA)
-    morceaux.append('Avoid: ' + lire(ICI / 'prompt_negatif.txt') + '.')
+    morceaux.append('Avoid: ' + lire(ICI / negatif) + '.')
     morceaux.append(CONSIGNES)
-    if e.get('references'): morceaux.append(REFERENCE)
+    if e.get('references'): morceaux.append(REFERENCE_PERSO if perso else REFERENCE)
     return '\n\n'.join(morceaux)
 
 
