@@ -46,11 +46,11 @@ def maintenant():
 
 def construire_prompt(e):
     perso = e.get('type') == 'personnage'
-    style = 'style_personnages.txt' if perso else 'style_commun.txt'
-    negatif = 'prompt_negatif_personnages.txt' if perso else 'prompt_negatif.txt'
-    morceaux = [lire(ICI / style), lire(ICI / e['prompt'])]
+    style = e.get('style', 'style_personnages.txt' if perso else 'style_commun.txt')  # « style »: null = aucun style ajouté
+    negatif = e.get('negatif', 'prompt_negatif_personnages.txt' if perso else 'prompt_negatif.txt')
+    morceaux = ([lire(ICI / style)] if style else []) + [lire(ICI / e['prompt'])]
     if e.get('magenta'): morceaux.append(MAGENTA)
-    morceaux.append('Avoid: ' + lire(ICI / negatif) + '.')
+    if negatif: morceaux.append('Avoid: ' + lire(ICI / negatif) + '.')
     morceaux.append(CONSIGNES)
     if e.get('references'): morceaux.append(REFERENCE_PERSO if perso else REFERENCE)
     return '\n\n'.join(morceaux)

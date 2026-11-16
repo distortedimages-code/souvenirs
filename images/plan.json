@@ -22,6 +22,22 @@
         "s01/fond"
       ],
       "magenta": true
+    },
+    {
+      "image": "da/entree_proche",
+      "prompt": "prompts/da/entree_proche.txt",
+      "references": [],
+      "style": null,
+      "negatif": "prompt_negatif_da.txt",
+      "type": "da"
+    },
+    {
+      "image": "da/entree_diorama",
+      "prompt": "prompts/da/entree_diorama.txt",
+      "references": [],
+      "style": null,
+      "negatif": "prompt_negatif_da.txt",
+      "type": "da"
     }
   ],
   "pixel": 8,
