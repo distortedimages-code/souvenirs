@@ -1,5 +1,5 @@
 {
-  "total": 0.3604,
+  "total": 0.4457,
   "images": {
     "s01/fond": {
       "empreinte": "b7a2522538ac32e5",
@@ -24,6 +24,18 @@
       "cout": 0.0554,
       "recue": "1536x1024",
       "date": "2026-11-16 16:28 UTC"
+    },
+    "da/entree_proche": {
+      "empreinte": "d522cf68ae4ab761",
+      "cout": 0.0427,
+      "recue": "1536x1024",
+      "date": "2026-11-16 17:32 UTC"
+    },
+    "da/entree_diorama": {
+      "empreinte": "edd4bb0d0a439816",
+      "cout": 0.0426,
+      "recue": "1536x1024",
+      "date": "2026-11-16 17:33 UTC"
     }
   }
 }
