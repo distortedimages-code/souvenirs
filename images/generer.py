@@ -27,6 +27,8 @@ REFERENCE = ("The attached image is a reference for palette, lighting, perspecti
 REFERENCE_PERSO = ("The first attached image is the background of the scene: use it only for palette, lighting, pixel size "
                    "and scale, and do not draw it. Any other attached image shows a character or object that must stay "
                    "exactly the same (face, hair, clothes, colours, proportions), as described above.")
+REFERENCE_DA = ("The attached image is the validated art direction of the game: match its style, palette, lighting, "
+                "camera angle and pixel size, but draw only what is described above.")
 MAGENTA = ("Everything that is not part of the described objects must be a perfectly flat, solid magenta (#FF00FF), "
            "with no gradient, no shadow and no texture, so it can be removed.")
 
@@ -52,7 +54,8 @@ def construire_prompt(e):
     if e.get('magenta'): morceaux.append(MAGENTA)
     if negatif: morceaux.append('Avoid: ' + lire(ICI / negatif) + '.')
     morceaux.append(CONSIGNES)
-    if e.get('references'): morceaux.append(REFERENCE_PERSO if perso else REFERENCE)
+    if e.get('references'):
+        morceaux.append(REFERENCE_PERSO if perso else REFERENCE_DA if e.get('type') == 'da' else REFERENCE)
     return '\n\n'.join(morceaux)
 
 

@@ -3,27 +3,6 @@
   "taille": "1536x1024",
   "images": [
     {
-      "image": "s01/fond",
-      "prompt": "prompts/s01/fond.txt",
-      "references": []
-    },
-    {
-      "image": "s01/plan_moyen",
-      "prompt": "prompts/s01/plan_moyen.txt",
-      "references": [
-        "s01/fond"
-      ],
-      "magenta": true
-    },
-    {
-      "image": "s01/premier_plan",
-      "prompt": "prompts/s01/premier_plan.txt",
-      "references": [
-        "s01/fond"
-      ],
-      "magenta": true
-    },
-    {
       "image": "da/entree_proche",
       "prompt": "prompts/da/entree_proche.txt",
       "references": [],
@@ -38,8 +17,83 @@
       "style": null,
       "negatif": "prompt_negatif_da.txt",
       "type": "da"
+    },
+    {
+      "image": "s01/fragment",
+      "prompt": "prompts/s01/fragment.txt",
+      "references": [
+        "da/entree_diorama"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da.txt",
+      "type": "da"
+    },
+    {
+      "image": "s01/garcons",
+      "prompt": "prompts/s01/garcons.txt",
+      "references": [
+        "s01/fragment"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
+    },
+    {
+      "image": "s01/avion_profil",
+      "prompt": "prompts/s01/avion_profil.txt",
+      "references": [
+        "da/entree_proche"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
+    },
+    {
+      "image": "s01/avion_gauche",
+      "prompt": "prompts/s01/avion_gauche.txt",
+      "references": [
+        "da/entree_proche",
+        "s01/avion_profil"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
+    },
+    {
+      "image": "s01/avion_droite",
+      "prompt": "prompts/s01/avion_droite.txt",
+      "references": [
+        "da/entree_proche",
+        "s01/avion_profil"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
+    },
+    {
+      "image": "s01/entree_basse",
+      "prompt": "prompts/s01/entree_basse.txt",
+      "references": [
+        "da/entree_proche"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da.txt",
+      "type": "da"
+    },
+    {
+      "image": "s01/grand_mere",
+      "prompt": "prompts/s01/grand_mere.txt",
+      "references": [
+        "s01/entree_basse"
+      ],
+      "style": "style_da.txt",
+      "negatif": "prompt_negatif_da_objets.txt",
+      "type": "personnage",
+      "magenta": true
     }
-  ],
-  "pixel": 8,
-  "couleurs": 16
+  ]
 }
