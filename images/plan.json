@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "taille": "1536x1024",
+  "images": [
+    {"image": "s01/fond", "prompt": "prompts/s01/fond.txt", "references": []},
+    {"image": "s01/plan_moyen", "prompt": "prompts/s01/plan_moyen.txt", "references": ["s01/fond"], "magenta": true},
+    {"image": "s01/premier_plan", "prompt": "prompts/s01/premier_plan.txt", "references": ["s01/fond"], "magenta": true}
+  ]
+}

@@ -1,0 +1,100 @@
+# Génère les décors de « Souvenirs » avec l'API Images d'OpenAI.
+# Se lance à la main (onglet Actions → Images → Run workflow), y compris depuis l'app GitHub sur iPhone.
+# Par défaut, c'est une SIMULATION gratuite : aucun appel à OpenAI, rien n'est enregistré.
+name: Images
+run-name: "Images — ${{ inputs.simulation && 'simulation gratuite' || 'génération RÉELLE' }}${{ inputs.souvenir != '' && format(' — {0}', inputs.souvenir) || '' }}${{ inputs.refaire != '' && format(' — refaire {0}', inputs.refaire) || '' }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      simulation:
+        description: "Simulation gratuite (aucun appel à OpenAI). Décochez pour la vraie génération, payante."
+        type: boolean
+        default: true
+      souvenir:
+        description: "Facultatif : seulement ce souvenir (ex. s01)"
+        type: string
+        default: ""
+      refaire:
+        description: "Facultatif : refaire ces images (ex. s01/fond ou s01/fond,s01/plan_moyen)"
+        type: string
+        default: ""
+      plafond:
+        description: "Plafond de dépense estimée, en dollars, toutes séances confondues"
+        type: string
+        default: "5"
+      qualite:
+        description: "Qualité demandée à OpenAI"
+        type: choice
+        options: [medium, high, xhigh]
+        default: high
+      modele:
+        description: "Modèle d'image OpenAI"
+        type: choice
+        options: [gpt-image-2.5-sunburst, gpt-image-2.6-sunburst, gpt-image-2.5-flare]
+        default: gpt-image-2.5-sunburst
+
+permissions:
+  contents: write  # enregistrer les images générées dans le dépôt
+
+concurrency:
+  group: images
+  cancel-in-progress: false
+
+jobs:
+  generer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: images/requirements.txt
+
+      - name: Installer les dépendances
+        run: pip install -r images/requirements.txt
+
+      - name: Vérifier la clé OpenAI
+        if: ${{ !inputs.simulation }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "::error::Le secret OPENAI_API_KEY est absent : Settings → Secrets and variables → Actions → New repository secret."
+            exit 1
+          fi
+          echo "Clé présente (sa valeur n'est jamais affichée)."
+
+      - name: Générer les images
+        id: gen
+        working-directory: images
+        env:
+          # la clé n'est transmise qu'en génération réelle, et seulement à cette étape
+          OPENAI_API_KEY: ${{ !inputs.simulation && secrets.OPENAI_API_KEY || '' }}
+          SIMULATION: ${{ inputs.simulation }}
+          SOUVENIR: ${{ inputs.souvenir }}
+          REFAIRE: ${{ inputs.refaire }}
+          PLAFOND: ${{ inputs.plafond }}
+          QUALITE: ${{ inputs.qualite }}
+          MODELE: ${{ inputs.modele }}
+        run: |
+          options=()
+          if [ "$SIMULATION" = "true" ]; then options+=(--simulation); fi
+          python generer.py "${options[@]}" --souvenir "$SOUVENIR" --refaire "$REFAIRE" \
+            --plafond "$PLAFOND" --qualite "$QUALITE" --modele "$MODELE"
+
+      - name: Enregistrer les images dans le dépôt
+        if: ${{ always() && !inputs.simulation && steps.gen.outcome != 'skipped' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add images/generees images/etat.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Aucune nouvelle image à enregistrer."
+          else
+            git commit -m "Images générées le $(date -u '+%Y-%m-%d à %H:%M UTC')"
+            git pull --rebase && git push
+          fi
