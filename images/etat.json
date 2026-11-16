@@ -1,0 +1,23 @@
+{
+  "total": 0.1524,
+  "images": {
+    "s01/fond": {
+      "empreinte": "8000b6a9f435c9be",
+      "cout": 0.0425,
+      "recue": "1536x1024",
+      "date": "2026-11-16 16:22 UTC"
+    },
+    "s01/plan_moyen": {
+      "empreinte": "ecbbcf544f6f7e29",
+      "cout": 0.055,
+      "recue": "1536x1024",
+      "date": "2026-11-16 16:23 UTC"
+    },
+    "s01/premier_plan": {
+      "empreinte": "f2fa0df854e169e9",
+      "cout": 0.0549,
+      "recue": "1536x1024",
+      "date": "2026-11-16 16:23 UTC"
+    }
+  }
+}
